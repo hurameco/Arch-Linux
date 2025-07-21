@@ -6,14 +6,13 @@
   "modules-center": ["clock"],
 
   "modules-right": [
-    "tray"
+    "tray",
     "pulseaudio",
     "backlight",
     "battery",
     "network",
     "cpu",
-    "memory",
-    "custom/docker",
+    "memory"
   ],
 
   "hyprland/workspaces": {
