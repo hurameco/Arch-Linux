@@ -15,14 +15,31 @@ warning() { echo -e "${YELLOW}WARNING${NC}\t:: $*"; }
 
 # Configuration
 PACMAN_PACKAGES=(
-    base-devel docker docker-compose dotnet-sdk ghostty git pavucontrol
-    telegram-desktop ttf-font-awesome ttf-jetbrains-mono ttf-jetbrains-mono-nerd
-    waybar waybar-hyprland
+    base-devel
+    docker
+    docker-compose
+    dotnet-sdk
+    ghostty
+    git
+    pavucontrol
+    telegram-desktop
+    ttf-font-awesome
+    ttf-jetbrains-mono
+    ttf-jetbrains-mono-nerd
+    waybar
+    waybar-hyprland
 )
 
 YAY_PACKAGES=(
-    blesh-git brave-bin nerd-fonts-jetbrains-mono openvpn3
-    outlook-for-linux-bin spotify-launcher stremio teams-for-linux
+    blesh-git
+    brave-bin
+    nerd-fonts-jetbrains-mono
+    openvpn3
+    outlook-for-linux-bin
+    spotify-launcher
+    stremio
+    teams-for-linux
+    thunderbird-nightly-bin
     visual-studio-code-bin
 )
 
@@ -35,6 +52,7 @@ GITHUB_REPO="https://raw.githubusercontent.com/hurameco/Arch-Linux/main"
 VERBOSE=0
 NO_CONFIRM=0
 DRY_RUN=0
+SKIP_CONFIGS=0
 while [[ $# -gt 0 ]]; do
     case $1 in
         --verbose) VERBOSE=1 ;;
@@ -42,15 +60,17 @@ while [[ $# -gt 0 ]]; do
         --dry-run) DRY_RUN=1 ;;
         --network-name) NETWORK_NAME="$2"; shift ;;
         --network-password) NETWORK_PASSWORD="$2"; shift ;;
+        --skip-configs) SKIP_CONFIGS=1 ;;
         --help) cat <<EOF
 Usage: $0 [OPTIONS]
 Options:
-    --help              Show this help message
-    --verbose           Enable verbose output
-    --no-confirm        Skip confirmation prompts
     --dry-run           Preview changes without modifying files
+    --help              Show this help message
     --network-name      Specify Wi-Fi network name
     --network-password  Specify Wi-Fi network password
+    --no-confirm        Skip confirmation prompts
+    --skip-configs
+    --verbose           Enable verbose output
 EOF
         exit 0 ;;
         *) error "Unknown option: $1" ;;
@@ -222,25 +242,28 @@ CONFIGS=(
     "waybar/style.css:./.config/waybar/style.css"
 )
 
-for config in "${CONFIGS[@]}"; do
-    # Localize IFS change and handle errors
-    IFS=':' read -r src dest _ <<< "$config" || {
-        warning "Malformed config entry: $config"
-        continue
-    }
 
-    # Expand ~ in paths if present
-    dest="${dest/#\~/$HOME}"
+if [[ "$SKIP_CONFIGS" -eq 0 ]]; then
+    for config in "${CONFIGS[@]}"; do
+        # Localize IFS change and handle errors
+        IFS=':' read -r src dest _ <<< "$config" || {
+            warning "Malformed config entry: $config"
+            continue
+        }
 
-    # Call function directly and check return code
-    download_config "$src" "$dest"
-    case $? in
-        0) success "Configured $dest" ;;
-        1) warning "Failed to configure $dest" ;;
-        2) info "Skipped $dest (user chose not to overwrite)" ;;
-        *) warning "Unknown return code for $dest" ;;
-    esac
-done
+        # Expand ~ in paths if present
+        dest="${dest/#\~/$HOME}"
+
+        # Call function directly and check return code
+        download_config "$src" "$dest"
+        case $? in
+            0) success "Configured $dest" ;;
+            1) warning "Failed to configure $dest" ;;
+            2) info "Skipped $dest (user chose not to overwrite)" ;;
+            *) warning "Unknown return code for $dest" ;;
+        esac
+    done
+fi
 
 success "Setup completed"
 exit 0
