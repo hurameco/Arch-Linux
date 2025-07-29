@@ -32,7 +32,7 @@ PACMAN_PACKAGES=(
 )
 
 YAY_PACKAGES=(
-    blesh-git
+    #blesh-git
     brave-bin
     nerd-fonts-jetbrains-mono
     openvpn3
