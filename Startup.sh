@@ -15,6 +15,7 @@ warning() { echo -e "${YELLOW}WARNING${NC}\t:: $*"; }
 
 # Configuration
 PACMAN_PACKAGES=(
+    aspnet-runtime
     base-devel
     docker
     docker-compose
